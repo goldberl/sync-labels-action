@@ -42,7 +42,7 @@ async function run() {
 
   const client = github.getOctokit(token)
 
-  const { data: issueData } = await client.issues.get({
+  const { data: issueData } = await client.rest.issues.get({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: issueNumber,
@@ -67,7 +67,7 @@ async function run() {
 
   const connectedLabelsResponses = await Promise.all(
     connectedIssues.map(async (connectedIssue) =>
-      client.issues.listLabelsOnIssue({
+      client.rest.issues.listLabelsOnIssue({
         owner: github.context.repo.owner,
         repo: github.context.repo.repo,
         issue_number: connectedIssue,
@@ -77,9 +77,9 @@ async function run() {
 
   const labels = uniq(
     connectedLabelsResponses.reduce<string[]>((acc, response) => {
-      const issueLabels = response.data.map((label) => label.name);
+      const issueLabels = response.data.map((label: { name: string }) => label.name);
       // Filter out unwanted labels and keep only the ones that are needed
-      const filteredLabels = issueLabels.filter(label => {
+      const filteredLabels = issueLabels.filter((label: string) => {
           if (labelsToInclude.length > 0 && !labelsToInclude.includes(label)) {
               // Label not in `labelsToInclude`
               return false;
@@ -95,7 +95,7 @@ async function run() {
     }, [])
   )
 
-  labels.length > 0 && await client.issues.addLabels({
+  labels.length > 0 && await client.rest.issues.addLabels({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: issueNumber,
