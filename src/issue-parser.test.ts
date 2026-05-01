@@ -1,3 +1,4 @@
+import { describe, it, expect } from '@jest/globals'
 import { createReferenceRegExp, parseReferencedIssues } from './issue-parser'
 
 describe('parse connected issues from issue body', () => {
